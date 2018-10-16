@@ -8,6 +8,7 @@
 // - (CUDA) Error Checking
 // - Checking and Generating Doubles
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <curand_kernel.h>
 #include <cuda_runtime.h>
@@ -212,6 +213,24 @@ int main(int argc, char* argv[]) {
 
   cublasSnrm2(handle, m * n, h_mn, 1, &result);
   printf("Result: %f\n", result);
+
+  printf("Parameters\n"
+         "\t numKernels:      %d\n"
+         "\t m:               %zu\n"
+         "\t n:               %zu\n"
+         "\t threadsPerBlock: %zu\n"
+         "\t randomMax:       %d\n"
+         "\t hostSeed:        %u\n"
+         "\t deviceSeed:      %u\n",
+         numKernels, m, n, threadsPerBlock, rMax, hSeed, dSeed);
+
+  printf("Timing   \tHost\t\tDevice\n"
+         "Copy In: \t%f  \t%f\n"
+         "Execute: \t%f  \t%f\n"
+         "Copy Out:\t%f  \t%f\n",
+          hTimeMs[0], dTimeMs[0],
+          hTimeMs[1], dTimeMs[1],
+          hTimeMs[2], dTimeMs[2]);
 
   cublasDestroy(handle);
 
