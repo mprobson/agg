@@ -16,17 +16,17 @@ typedef float precision_t;
 __global__
 void init(unsigned int seed, curandState* state) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  curand_init(seed, idx, 0, &state[id]);
+  curand_init(seed, idx, 0, &state[idx]);
 }
 
 __global__
 void generate(precision_t* m, size_t m, int rMax, curandState* state) {
-  int idx = blockId.x * blockDim.x + threadIdx.x;
-  curandState localState = state[id];
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  curandState localState = state[idx];
   for (int i = idx; i < m ; i += gridDim.x) {
     m[i] = curand_uniform(&localState) * rMax;
   }
-  state[id] = localState;
+  state[idx] = localState;
 }
 
 __global__
