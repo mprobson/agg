@@ -15,6 +15,11 @@
 
 typedef float precision_t;
 
+double hostElapsedTimeMs(timespec start, timespec stop) {
+  return (stop.tv_sec  - start.tv_sec)  * 1000 +
+         (stop.tv_nsec - start.tv_nsec) / 1000000;
+}
+
 __global__
 void empty() {
 };
@@ -114,6 +119,15 @@ int main(int argc, char* argv[]) {
   // Ensure random number generation finishes
   cudaDeviceSynchronize();
 
+  // Timing
+  timespec hStart, hStop;
+  double hTimeMs [3];
+
+  cudaEvent_t dStart, dStop;
+  cudaEventCreate(&dStart);
+  cudaEventCreate(&dStop);
+  float dTimeMs [3];
+
   // Copy Warmup
   for(int i = 0; i < 100; i++) {
 #if 0
@@ -123,17 +137,36 @@ int main(int argc, char* argv[]) {
 #endif
   }
 
+  // - events
+  cudaEventRecord(dStart);
+
+  // - host side
+  // TODO check return value for errors
+  clock_gettime(CLOCK_MONOTONIC, &hStart);
+
   // Copy Vector
 #if 0
   cudaMemcpyAsync();
 #else
   cudaMemcpy(d_n, h_n, n * sizeof(precision_t), cudaMemcpyHostToDevice);
 #endif // 1
+  // Timing
+  // - host side
+  clock_gettime(CLOCK_MONOTONIC, &hStop);
+  // - events
+  cudaEventRecord(dStop);
+
+  // Elapsed Time
+  cudaEventElapsedTime(&(dTimeMs[0]), dStart, dStop);
+  hTimeMs[0] = hostElapsedTimeMs(hStart, hStop);
 
   // Warmup
   for (int i = 0; i < 100; i++) {
     empty<<<1,1>>>();
   }
+
+  cudaEventRecord(dStart);
+  clock_gettime(CLOCK_MONOTONIC, &hStart);
 
   // Execute
   for (int i = 0; i < numKernels; i++) {
@@ -141,12 +174,29 @@ int main(int argc, char* argv[]) {
     outer<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, d_n, d_mn, m, n);
   }
 
+  cudaDeviceSynchronize();
+
+  clock_gettime(CLOCK_MONOTONIC, &hStop);
+  cudaEventRecord(dStop);
+
+  cudaEventElapsedTime(&(dTimeMs[1]), dStart, dStop);
+  hTimeMs[1] = hostElapsedTimeMs(hStart, hStop);
+
+  cudaEventRecord(dStart);
+  clock_gettime(CLOCK_MONOTONIC, &hStart);
+
   // Copy Back
 #if 0
   cudaMemcpyAsync();
 #else
   cudaMemcpy(h_mn, d_mn, m * n * sizeof(precision_t), cudaMemcpyDeviceToHost);
 #endif // 1
+
+  clock_gettime(CLOCK_MONOTONIC, &hStop);
+  cudaEventRecord(dStop);
+
+  cudaEventElapsedTime(&(dTimeMs[2]), dStart, dStop);
+  hTimeMs[2] = hostElapsedTimeMs(hStart, hStop);
 
   // Do something with the data to prevent optimization
   // mutiply by scalar and print? Do some norm/reduction?
