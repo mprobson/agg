@@ -20,17 +20,18 @@ void init(unsigned int seed, curandState* state) {
 }
 
 __global__
-void generate(precision_t* m, size_t m, int rMax, curandState* state) {
+void generate(precision_t* d_m, size_t m, int rMax, curandState* state) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   curandState localState = state[idx];
   for (int i = idx; i < m ; i += gridDim.x) {
-    m[i] = curand_uniform(&localState) * rMax;
+    d_m[i] = curand_uniform(&localState) * rMax;
   }
   state[idx] = localState;
 }
 
 __global__
-void outer(precision_t* m, precision_t* n, precision_t* mn) {
+void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
+    size_t m, size_t n) {
 }
 
 int main(int argc, char* argv[]) {
