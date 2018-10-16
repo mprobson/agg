@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+#include <unistd.h>
 #include <curand_kernel.h>
 #include <cuda_runtime.h>
 #include "cublas_v2.h"
@@ -74,8 +75,39 @@ int main(int argc, char* argv[]) {
   unsigned int dSeed = hSeed;
 
   // Process Input
+  int c;
   if (argc > 1) {
-    // TODO
+    while((c = getopt(argc, argv, "k:m:n:t:r:h:d:")) != -1) {
+      switch (c) {
+        case 'k':
+          numKernels = atoi(optarg); // TODO static cast?
+          break;
+        case 'm':
+          m = atoi(optarg); // TODO static cast?
+          break;
+        case 'n':
+          n = atoi(optarg); // TODO static cast?
+          break;
+        case 't':
+          threadsPerBlock = atoi(optarg); // TODO static cast?
+          break;
+        case 'r':
+          rMax = atoi(optarg); // TODO static cast?
+          break;
+        case 'h':
+          hSeed = atoi(optarg); // TODO static cast?
+          break;
+        case 'd':
+          dSeed = atoi(optarg); // TODO static cast?
+          break;
+        case '?':
+          printf("Ignoring unrecognized option: '-%c'\n", optopt);
+          break;
+        default:
+          printf("Problem parsing input\n");
+          break;
+      }
+    }
   }
 
   // Allocate Memory
