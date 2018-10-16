@@ -44,14 +44,17 @@ void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
 
 int main(int argc, char* argv[]) {
   // Defaults
-  // - k kernels
-  int k = 1;
+  // - number of kernels
+  int numKernels = 1;
 
   // - m data on GPU
-  size_t m = 1000;
+  size_t m = 1024;
 
   // - n data on host
-  size_t n = 1000;
+  size_t n = 1024;
+
+  // - threadsPerBlock
+  size_t threadsPerBlock = 128;
 
   // - r max number
   int rMax = 100;
