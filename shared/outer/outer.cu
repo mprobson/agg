@@ -83,20 +83,22 @@ int main(int argc, char* argv[]) {
   cudaMalloc(&d_n, n * sizeof(precision_t));
 
   // - Matrix
-  precision_t h_mn;
+  precision_t* h_mn;
   cudaMallocHost(&h_mn, m * n * sizeof(precision_t));
-  precision_t d_mn;
+  precision_t* d_mn;
   cudaMalloc(&d_mn, m * n * sizeof(precision_t));
 
+  // TODO could clamp state size smaller if we know total num threads
   curandState* d_states;
-  cudaMalloc(&d_states, * sizeof(curandState));
+  cudaMalloc(&d_states, m * sizeof(curandState));
 #endif // 1
 
-  //init<<<>>>(dSeed, d_states);
+  // TODO implement rounding for num blocks launched
+  init<<<m/threadsPerBlock, threadsPerBlock>>>(dSeed, d_states);
 
   // Generate Two Vectors
   // - Device
-  //generate<<<>>>(d_m, m, rMax, d_states);
+  generate<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, m, rMax, d_states);
 
   // - Host
   std::srand(hSeed);
@@ -115,7 +117,10 @@ int main(int argc, char* argv[]) {
 #endif // 1
 
   // Execute
-  //outer<<<>>>(d_m, d_n, d_mn);
+  for (int i = 0; i < numKernels; i++) {
+    // TODO add offsets into matricies for multiple kernels
+    outer<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, d_n, d_mn, m, n);
+  }
 
   // Copy Back
 #if 0
@@ -132,4 +137,6 @@ int main(int argc, char* argv[]) {
   cudaFree(d_mn);
   cudaFree(d_states);
   // free/cudaFree h_*
+
+  return EXIT_SUCCESS;
 }
