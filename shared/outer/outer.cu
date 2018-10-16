@@ -32,6 +32,13 @@ void generate(precision_t* d_m, size_t m, int rMax, curandState* state) {
 __global__
 void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
     size_t m, size_t n) {
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  // TODO transform loop for coalesced writes? and/or use shared mem?
+  for (int i = idx; i < m; i += gridDim.x * blockDim.x) {
+    for (int j = 0; j < n; j ++) {
+      d_mn[i * m + j] = d_m[i] * d_n[j];
+    }
+  }
 }
 
 int main(int argc, char* argv[]) {
