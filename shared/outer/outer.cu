@@ -19,7 +19,7 @@ typedef float precision_t;
 
 double hostElapsedTimeMs(timespec start, timespec stop) {
   return (stop.tv_sec  - start.tv_sec)  * 1000 +
-         (stop.tv_nsec - start.tv_nsec) / 1000000;
+         (stop.tv_nsec - start.tv_nsec) / 1000000.;
 }
 
 __global__
