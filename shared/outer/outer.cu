@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <curand_kernel.h>
+#include <cuda_runtime.h>
 
 typedef float precision_t;
 
