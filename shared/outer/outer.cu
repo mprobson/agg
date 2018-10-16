@@ -11,6 +11,7 @@
 #include <ctime>
 #include <curand_kernel.h>
 #include <cuda_runtime.h>
+#include "cublas_v2.h"
 
 typedef float precision_t;
 
@@ -131,6 +132,20 @@ int main(int argc, char* argv[]) {
 
   // Do something with the data to prevent optimization
   // mutiply by scalar and print? Do some norm/reduction?
+  precision_t result;
+  cublasHandle_t handle;
+  cublasStatus_t stat;
+
+  stat = cublasCreate(&handle);
+  if (stat != CUBLAS_STATUS_SUCCESS) {
+    printf ("CUBLAS initialization failed\n");
+    return EXIT_FAILURE;
+  }
+
+  cublasSnrm2(handle, m * n, h_mn, 1, &result);
+  printf("Result: %f\n", result);
+
+  cublasDestroy(handle);
 
   cudaFree(d_m);
   cudaFree(d_n);
