@@ -16,6 +16,10 @@
 typedef float precision_t;
 
 __global__
+void empty() {
+};
+
+__global__
 void init(unsigned int seed, curandState* state) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   curand_init(seed, idx, 0, &state[idx]);
@@ -110,12 +114,26 @@ int main(int argc, char* argv[]) {
   // Ensure random number generation finishes
   cudaDeviceSynchronize();
 
+  // Copy Warmup
+  for(int i = 0; i < 100; i++) {
+#if 0
+    cudaMemcpyAsync();
+#else
+    cudaMemcpy(d_n, h_n, sizeof(precision_t), cudaMemcpyHostToDevice);
+#endif
+  }
+
   // Copy Vector
 #if 0
   cudaMemcpyAsync();
 #else
   cudaMemcpy(d_n, h_n, n * sizeof(precision_t), cudaMemcpyHostToDevice);
 #endif // 1
+
+  // Warmup
+  for (int i = 0; i < 100; i++) {
+    empty<<<1,1>>>();
+  }
 
   // Execute
   for (int i = 0; i < numKernels; i++) {
