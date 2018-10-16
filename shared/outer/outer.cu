@@ -189,6 +189,8 @@ int main(int argc, char* argv[]) {
   // - events
   cudaEventRecord(dStop);
 
+  cudaEventSynchronize(dStop);
+
   // Elapsed Time
   cudaEventElapsedTime(&(dTimeMs[0]), dStart, dStop);
   hTimeMs[0] = hostElapsedTimeMs(hStart, hStop);
@@ -212,6 +214,8 @@ int main(int argc, char* argv[]) {
   clock_gettime(CLOCK_MONOTONIC, &hStop);
   cudaEventRecord(dStop);
 
+  cudaEventSynchronize(dStop);
+
   cudaEventElapsedTime(&(dTimeMs[1]), dStart, dStop);
   hTimeMs[1] = hostElapsedTimeMs(hStart, hStop);
 
@@ -227,6 +231,8 @@ int main(int argc, char* argv[]) {
 
   clock_gettime(CLOCK_MONOTONIC, &hStop);
   cudaEventRecord(dStop);
+
+  cudaEventSynchronize(dStop);
 
   cudaEventElapsedTime(&(dTimeMs[2]), dStart, dStop);
   hTimeMs[2] = hostElapsedTimeMs(hStart, hStop);
