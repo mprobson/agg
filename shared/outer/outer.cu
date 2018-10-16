@@ -23,7 +23,7 @@ __global__
 void generate(precision_t* d_m, size_t m, int rMax, curandState* state) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   curandState localState = state[idx];
-  for (int i = idx; i < m ; i += gridDim.x) {
+  for (int i = idx; i < m ; i += gridDim.x * blockDim.x) {
     d_m[i] = curand_uniform(&localState) * rMax;
   }
   state[idx] = localState;
