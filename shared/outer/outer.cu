@@ -251,9 +251,10 @@ int main(int argc, char* argv[]) {
          "\t n:               %zu\n"
          "\t threadsPerBlock: %zu\n"
          "\t randomMax:       %d\n"
+         "\t nWarmupIter:     %d\n"
          "\t hostSeed:        %u\n"
          "\t deviceSeed:      %u\n",
-         numKernels, m, n, threadsPerBlock, rMax, hSeed, dSeed);
+         numKernels, m, n, threadsPerBlock, rMax, nWarmupIter, hSeed, dSeed);
 
   printf("Timing   \tHost\t\tDevice\n"
          "Copy In: \t%f  \t%f\n"
