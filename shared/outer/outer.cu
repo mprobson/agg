@@ -56,6 +56,7 @@ void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
 
 int main(int argc, char* argv[]) {
   // Defaults
+  // TODO unsigned for all ints?
   // - number of kernels
   int numKernels = 1;
 
@@ -75,30 +76,31 @@ int main(int argc, char* argv[]) {
   unsigned int dSeed = hSeed;
 
   // Process Input
+  // TODO add static cast to atoi?
   int c;
   if (argc > 1) {
     while((c = getopt(argc, argv, "k:m:n:t:r:h:d:")) != -1) {
       switch (c) {
         case 'k':
-          numKernels = atoi(optarg); // TODO static cast?
+          numKernels = atoi(optarg);
           break;
         case 'm':
-          m = atoi(optarg); // TODO static cast?
+          m = atoi(optarg);
           break;
         case 'n':
-          n = atoi(optarg); // TODO static cast?
+          n = atoi(optarg);
           break;
         case 't':
-          threadsPerBlock = atoi(optarg); // TODO static cast?
+          threadsPerBlock = atoi(optarg);
           break;
         case 'r':
-          rMax = atoi(optarg); // TODO static cast?
+          rMax = atoi(optarg);
           break;
         case 'h':
-          hSeed = atoi(optarg); // TODO static cast?
+          hSeed = atoi(optarg);
           break;
         case 'd':
-          dSeed = atoi(optarg); // TODO static cast?
+          dSeed = atoi(optarg);
           break;
         case '?':
           printf("Ignoring unrecognized option: '-%c'\n", optopt);
