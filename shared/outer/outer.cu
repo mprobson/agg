@@ -237,21 +237,6 @@ int main(int argc, char* argv[]) {
   cudaEventElapsedTime(&(dTimeMs[2]), dStart, dStop);
   hTimeMs[2] = hostElapsedTimeMs(hStart, hStop);
 
-  // Do something with the data to prevent optimization
-  // mutiply by scalar and print? Do some norm/reduction?
-  precision_t result;
-  cublasHandle_t handle;
-  cublasStatus_t stat;
-
-  stat = cublasCreate(&handle);
-  if (stat != CUBLAS_STATUS_SUCCESS) {
-    printf ("CUBLAS initialization failed\n");
-    return EXIT_FAILURE;
-  }
-
-  cublasSnrm2(handle, m * n, h_mn, 1, &result);
-  printf("Result: %f\n", result);
-
   printf("Parameters\n"
          "\t numKernels:      %d\n"
          "\t m:               %zu\n"
@@ -269,6 +254,21 @@ int main(int argc, char* argv[]) {
           hTimeMs[0], dTimeMs[0],
           hTimeMs[1], dTimeMs[1],
           hTimeMs[2], dTimeMs[2]);
+
+  // Do something with the data to prevent optimization
+  // mutiply by scalar and print? Do some norm/reduction?
+  precision_t result;
+  cublasHandle_t handle;
+  cublasStatus_t stat;
+
+  stat = cublasCreate(&handle);
+  if (stat != CUBLAS_STATUS_SUCCESS) {
+    printf ("CUBLAS initialization failed\n");
+    return EXIT_FAILURE;
+  }
+
+  cublasSnrm2(handle, m * n, h_mn, 1, &result);
+  printf("Result: %f\n", result);
 
   cublasDestroy(handle);
 
