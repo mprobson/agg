@@ -72,6 +72,9 @@ int main(int argc, char* argv[]) {
   // - r max number
   int rMax = 100;
 
+  // - number of warmup iterations
+  int nWarmupIter = 1000;
+
   unsigned int hSeed = std::time(NULL);
   unsigned int dSeed = hSeed;
 
@@ -79,7 +82,7 @@ int main(int argc, char* argv[]) {
   // TODO add static cast to atoi?
   int c;
   if (argc > 1) {
-    while((c = getopt(argc, argv, "k:m:n:t:r:h:d:")) != -1) {
+    while((c = getopt(argc, argv, "k:m:n:t:r:w:h:d:")) != -1) {
       switch (c) {
         case 'k':
           numKernels = atoi(optarg);
@@ -95,6 +98,9 @@ int main(int argc, char* argv[]) {
           break;
         case 'r':
           rMax = atoi(optarg);
+          break;
+        case 'w':
+          nWarmupIter = atoi(optarg);
           break;
         case 'h':
           hSeed = atoi(optarg);
@@ -164,7 +170,7 @@ int main(int argc, char* argv[]) {
   float dTimeMs [3];
 
   // Copy Warmup
-  for(int i = 0; i < 100; i++) {
+  for(int i = 0; i < nWarmupIter; i++) {
 #if 0
     cudaMemcpyAsync();
 #else
@@ -198,7 +204,7 @@ int main(int argc, char* argv[]) {
   hTimeMs[0] = hostElapsedTimeMs(hStart, hStop);
 
   // Warmup
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < nWarmupIter; i++) {
     empty<<<1,1>>>();
   }
 
