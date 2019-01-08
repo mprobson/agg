@@ -144,6 +144,12 @@ int main(int argc, char* argv[]) {
   cudaMalloc(&d_states, m * sizeof(curandState));
 #endif // 1
 
+  // Allocate Streams
+  cudaStream_t streams[numKernels];
+  for (int i = 0; i < numKernels; i++) {
+    cudaStreamCreate(&streams[i]);
+  }
+
   // TODO implement rounding for num blocks launched
   init<<<m/threadsPerBlock, threadsPerBlock>>>(dSeed, d_states);
 
@@ -214,7 +220,7 @@ int main(int argc, char* argv[]) {
   // Execute
   for (int i = 0; i < numKernels; i++) {
     // TODO add offsets into matricies for multiple kernels
-    outer<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, d_n, d_mn, m, n);
+    outer<<<m/threadsPerBlock, threadsPerBlock, 0, streams[i]>>>(d_m, d_n, d_mn, m, n);
   }
 
   cudaDeviceSynchronize();
