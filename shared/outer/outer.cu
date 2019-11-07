@@ -15,6 +15,8 @@
 #include <cuda_runtime.h>
 #include "cublas_v2.h"
 
+#define PRINT_STREAM 1
+
 typedef float precision_t;
 
 double hostElapsedTimeMs(timespec start, timespec stop) {
@@ -51,11 +53,19 @@ void generate(precision_t* d_m, size_t m, int rMax, curandState* state) {
 
 __global__
 void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
-    size_t m, size_t n) {
+    size_t m, size_t n,
+#if PRINT_STREAM
+    int streamId
+#endif
+    ) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   // Print SM
+#if PRINT_STREAM
+  if(threadIdx.x == 0) printf("Kernel: %d\tBlock: %d\tSM %d\n", streamId, blockIdx.x, mySmId());
+#else
   if(threadIdx.x == 0) printf("SM %d\n", mySmId());
+#endif
 
   // TODO transform loop for coalesced writes? and/or use shared mem?
   for (int i = idx; i < m; i += gridDim.x * blockDim.x) {
@@ -231,7 +241,11 @@ int main(int argc, char* argv[]) {
   // Execute
   for (int i = 0; i < numKernels; i++) {
     // TODO add offsets into matricies for multiple kernels
+#if PRINT_STREAM
+    outer<<<m/threadsPerBlock, threadsPerBlock, 0, streams[i]>>>(d_m, d_n, d_mn, m, n, i);
+#else
     outer<<<m/threadsPerBlock, threadsPerBlock, 0, streams[i]>>>(d_m, d_n, d_mn, m, n);
+#endif
   }
 
   cudaDeviceSynchronize();
