@@ -176,7 +176,10 @@ int main(int argc, char* argv[]) {
 
   // Generate Two Vectors
   // - Device
-  generate<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, m, rMax, d_states);
+  // Warmup
+  //for (int i = 0; i < nWarmupIter; i++) {
+    generate<<<m/threadsPerBlock, threadsPerBlock>>>(d_m, m, rMax, d_states);
+  //}
 
   // - Host
   std::srand(hSeed);
