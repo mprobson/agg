@@ -232,6 +232,18 @@ int main(int argc, char* argv[]) {
   // Elapsed Time
   cudaEventElapsedTime(&(dTimeMs[0]), dStart, dStop);
   hTimeMs[0] = hostElapsedTimeMs(hStart, hStop);
+#if 0
+  float dTempMs;
+  cudaEventElapsedTime(&dTempMs, dStart, dStop);
+  printf("Time Debug: %f - %f = %f\n", dStop, dStart, dTempMs);
+#endif
+#if 0
+  double hTempMs = hostElapsedTimeMs(hStart, hStop);
+  long    tempNs = hStop.tv_nsec - hStart.tv_nsec;
+  double  tempMs = tempNs / 1000000.;
+  printf("Time Debug:( %ld - %ld) + (%ld - %ld) = %f = %ld / 1000000 = %f\n",
+      hStop.tv_sec, hStart.tv_sec, hStop.tv_nsec, hStart.tv_nsec, hTempMs, tempNs, tempMs);
+#endif
 
   // Warmup
   for (int i = 0; i < nWarmupIter; i++) {
