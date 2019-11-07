@@ -22,6 +22,13 @@ double hostElapsedTimeMs(timespec start, timespec stop) {
          (stop.tv_nsec - start.tv_nsec) / 1000000.;
 }
 
+__device__
+unsigned mySmId() {
+  unsigned smId;
+  asm volatile("mov.u32 %0, %%smid;" : "=r"(smId));
+  return smId;
+}
+
 __global__
 void empty() {
 };
@@ -46,6 +53,10 @@ __global__
 void outer(precision_t* d_m, precision_t* d_n, precision_t* d_mn,
     size_t m, size_t n) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  // Print SM
+  if(threadIdx.x == 0) printf("SM %d\n", mySmId());
+
   // TODO transform loop for coalesced writes? and/or use shared mem?
   for (int i = idx; i < m; i += gridDim.x * blockDim.x) {
     for (int j = 0; j < n; j ++) {
